@@ -1,5 +1,3 @@
-import json
-
 import requests
 from flask import Blueprint
 import pandas as pd
@@ -66,21 +64,18 @@ def start_flow():
     except Exception as e:
         return "Something went wrong: ",e
 
-@pokemons.route('/home')
-def home():
-    sql = db.text('SELECT * FROM stats')
+@pokemons.route('/punto4/1')
+def punto41():
+    sql = db.text('select p.id,p.name, p.image  from pokemon_types as pt join pokemon as p on pt.pokemon_id = p.id group by p.id having COUNT(*) >1')
     query = db.engine.execute(sql)
     df = pd.DataFrame(query.fetchall())
-    df.to_excel("prueba_tigo_bancolombia.xlsx", sheet_name="Punto 4", index=False)
+    df.to_excel("punto4/script1.xlsx", index=False)
     return "success"
 
-@pokemons.route('/test')
-def count():
-    req = requests.get('https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0')
-    results = req.json().get('results')
-    for poke in results:
-        url = poke.get('url')
-        req = requests.get(url)
-        data = req.json()
-        print(data)
-        return "success"
+@pokemons.route('/punto4/2')
+def punto42():
+    sql = db.text('select pt.type_id, t.name, COUNT(*) from pokemon_types as pt join ptypes as t on pt.type_id = t.id group by t.id order by COUNT(*) desc limit 1')
+    query = db.engine.execute(sql)
+    df = pd.DataFrame(query.fetchall())
+    df.to_excel("punto4/script2.xlsx", index=False)
+    return "success"
